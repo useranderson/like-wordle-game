@@ -32,7 +32,7 @@ const KeyBoard = ({
   );
 
   return (
-    <div>
+    <div className="py-4">
       <KeyBoardRow
         keys={keys1}
         previousLetters={previousLetters}

@@ -7,3 +7,4 @@ export { default as SelectIndicator } from "./SelectIndicator";
 export { default as Modal } from "./Modal";
 export { default as LettersRows } from "./LettersRows";
 export { default as Button } from "./Button";
+export { default as ErrorContainer } from "./ErrorContainer";

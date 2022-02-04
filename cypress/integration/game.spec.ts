@@ -74,7 +74,7 @@ describe("game", () => {
     cy.get("[data-cy=modal-lost]").should("be.visible").contains("Perdeu");
   });
 
-  it("should start a new game by clicking 'Jogar novamente'", () => {
+  it("should start a new game by clicking 'Jogar novamente", () => {
     cy.get("[data-cy=letters-row]")
       .should("be.visible")
       .should("have.length", 6);
@@ -86,5 +86,15 @@ describe("game", () => {
     cy.get("[data-cy=modal-won]").should("not.exist");
 
     cy.get("[data-cy=selector-indicator]").parent().should("not.have.text");
+  });
+
+  it("should show error if trying to send incomplete word", () => {
+    cy.get("[data-cy=letters-row]")
+      .should("be.visible")
+      .should("have.length", 6);
+
+    keysClick(["T", "E", "S", "T"]);
+
+    cy.get("[data-cy=error-container]").should("be.visible");
   });
 });

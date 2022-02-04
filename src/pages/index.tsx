@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import type { NextPage } from "next";
 
 import type { Letter } from "./api/word";
@@ -12,6 +10,7 @@ import {
   Modal,
   LettersRows,
   Button,
+  ErrorContainer,
 } from "../components";
 import { getData } from "../utils";
 
@@ -28,6 +27,7 @@ const Home: NextPage = () => {
   const [previousAttempts, setPreviousAttempts] = useState<Letter[][]>([]);
   const [previousLetters, setPreviousLetters] = useState<Letter[]>([]);
   const [selectedInput, setSelectedInput] = useState(() => 0);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     handleReset({ keys: [] });
@@ -67,13 +67,18 @@ const Home: NextPage = () => {
   };
 
   const handleEnterClick = () => {
+    if (!!keys.filter((key) => !key).length)
+      return setError("Apenas palavras com 5 letras");
+
+    setError("");
+
     getData({
       keys: keys.map((key) => key.toLocaleLowerCase()),
       wordId,
     }).then(({ data: responseData }) => {
       const { data, error } = responseData;
 
-      if (error) return null;
+      if (error) return setError("Ops! Houve um erro");
 
       setPreviousAttempts((attempts) => [...attempts, data.letters]);
       setKeys((keys) => keys.map(() => ""));
@@ -104,9 +109,9 @@ const Home: NextPage = () => {
 
   const emptyLines =
     previousAttempts.length < 5
-      ? new Array(5 - previousAttempts.length)
-          .fill("")
-          .map(() => new Array(keys.length).fill("").map(() => null))
+      ? Array.from({ length: 5 - previousAttempts.length }, () => []).map(() =>
+          Array.from({ length: keys.length }, () => null)
+        )
       : [];
 
   const won =
@@ -153,10 +158,15 @@ const Home: NextPage = () => {
           </Button>
         </Modal>
       )}
-      <main className="flex flex-col h-full w-full items-center justify-between">
+      <main className="w-full h-full">
         <div className="flex flex-col h-full w-full items-center justify-between">
-          <div className="text-3xl font-bold text-white p-4">LIKE WORDLE</div>
-          <div className="mb-10">
+          <div>
+            <div className="text-3xl font-bold text-white p-2 w-full text-center">
+              LIKE WORDLE
+            </div>
+            {error && <ErrorContainer>{error}</ErrorContainer>}
+          </div>
+          <div className="p-4">
             {previousAttempts.map((attempt, attemptIndex) => (
               <LettersRows key={attemptIndex}>
                 {attempt.map((letter, letterIndex) => (
@@ -200,11 +210,6 @@ const Home: NextPage = () => {
             handleEnterClick={handleEnterClick}
             handleKeyClick={handleKeyClick}
           />
-        </div>
-        <div className="text-center p-2 cursor-pointer">
-          <Link href="https://github.com/useranderson">
-            <Image width={24} height={24} src="/github.png" />
-          </Link>
         </div>
       </main>
     </PageContainer>
