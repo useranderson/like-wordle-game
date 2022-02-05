@@ -3,9 +3,9 @@
 const keyClick = (key: string) =>
   cy.get("[data-cy=key-container]").contains(key).click();
 
-const keysClick = (keys: string[]) => {
+const keysClick = (keys: string[], enter: boolean = true) => {
   keys.forEach((key) => keyClick(key));
-  return keyClick("ENTER");
+  return enter && keyClick("ENTER");
 };
 
 describe("game", () => {
@@ -96,5 +96,24 @@ describe("game", () => {
     keysClick(["T", "E", "S", "T"]);
 
     cy.get("[data-cy=error-container]").should("be.visible");
+  });
+
+  it("should be possible to select letter with click", () => {
+    cy.get("[data-cy=letters-row]")
+      .should("be.visible")
+      .should("have.length", 6);
+
+    keysClick(["T", "E", "A", "T", "E"], false);
+
+    cy.get("[data-cy=letters-row]")
+      .contains("A")
+      .should("have.length", 1)
+      .click()
+      .get("[data-cy=selector-indicator]")
+      .should("have.length", 1);
+
+    keysClick(["S"]);
+
+    cy.get("[data-cy=modal-won]").should("be.visible");
   });
 });

@@ -16,7 +16,7 @@ This is a Brazilian minimalist version of the famous [Wordle](https://www.powerl
 - [x] should show error if trying to send incomplete word
 - [ ] should show an error if you try to send a word that doesn't exist in the list
 - [ ] should be possible to choose letters using the keyboard
-- [ ] should be possible to select letter with click
+- [x] should be possible to select letter with click
 
 ## Live version
 

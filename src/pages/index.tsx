@@ -107,6 +107,10 @@ const Home: NextPage = () => {
     });
   };
 
+  const handleLetterClick = (position: number) => {
+    setSelectedInput(position)
+  }
+
   const emptyLines =
     previousAttempts.length < 5
       ? Array.from({ length: 5 - previousAttempts.length }, () => []).map(() =>
@@ -185,6 +189,7 @@ const Home: NextPage = () => {
                 {keys.map((key, index) => (
                   <LetterContainer
                     key={index}
+                    onClick={() => handleLetterClick(index)}
                     className={`${colors["unknow"]}`}
                   >
                     {index === selectedInput && <SelectIndicator />}
