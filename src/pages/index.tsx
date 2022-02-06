@@ -29,9 +29,7 @@ const Home: NextPage = () => {
   const [selectedInput, setSelectedInput] = useState(() => 0);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    handleReset({ keys: [] });
-  }, [setWordId, setKeys]);
+  useEffect(() => handleReset(), [setWordId, setKeys]);
 
   const handleKeyClick = (newKey: string) => {
     setKeys((keys) =>
@@ -78,38 +76,35 @@ const Home: NextPage = () => {
     }).then(({ data: responseData }) => {
       const { data, error } = responseData;
 
+      if (error && error.message === "Invalid word")
+        return setError("Palavra inválida");
+
       if (error) return setError("Ops! Houve um erro");
 
-      setPreviousAttempts((attempts) => [...attempts, data.letters]);
+      data && setPreviousAttempts((attempts) => [...attempts, data.letters]);
       setKeys((keys) => keys.map(() => ""));
       setSelectedInput(0);
-      data.letters.map((letter: Letter) => addLetter(letter));
+      data && data.letters.map((letter: Letter) => addLetter(letter));
     });
   };
 
-  const handleReset = ({
-    keys,
-    wordId,
-  }: {
-    keys: string[];
-    wordId?: number;
-  }) => {
-    getData({ keys, wordId }).then(({ data: responseData }) => {
+  const handleReset = () => {
+    getData({ keys: [], wordId: undefined }).then(({ data: responseData }) => {
       const { data, error } = responseData;
 
       if (error) return null;
 
-      setWordId(data.wordId);
+      data && setWordId(data.wordId);
       setPreviousAttempts([]);
       setSelectedInput(0);
-      setKeys(data.letters.map(() => ``));
+      data && setKeys(data.letters.map(() => ``));
       setPreviousLetters([]);
     });
   };
 
   const handleLetterClick = (position: number) => {
-    setSelectedInput(position)
-  }
+    setSelectedInput(position);
+  };
 
   const emptyLines =
     previousAttempts.length < 5
@@ -143,10 +138,7 @@ const Home: NextPage = () => {
               )
             )}
           </LettersRows>
-          <Button
-            data-cy="play-again"
-            onClick={() => handleReset({ wordId, keys })}
-          >
+          <Button data-cy="play-again" onClick={handleReset}>
             Jogar Novamente
           </Button>
         </Modal>
@@ -154,10 +146,7 @@ const Home: NextPage = () => {
       {!won && lost && (
         <Modal data-cy="modal-lost">
           <div className="text-4xl w-full mb-10">Perdeu</div>
-          <Button
-            data-cy="play-again"
-            onClick={() => handleReset({ keys, wordId })}
-          >
+          <Button data-cy="play-again" onClick={handleReset}>
             Jogar Novamente
           </Button>
         </Modal>

@@ -22,11 +22,11 @@ describe("game", () => {
       .should("be.visible")
       .should("have.length", 6);
 
-    keysClick(["M", "E", "T", "R", "O"]);
+    keysClick(["T", "R", "E", "T", "A"]);
 
-    cy.get("[data-cy=letter-container-wrong]").should("have.length", 3);
+    cy.get("[data-cy=letter-container-wrong]").should("have.length", 2);
     cy.get("[data-cy=letter-container-exists]").should("have.length", 1);
-    cy.get("[data-cy=letter-container-right]").should("have.length", 1);
+    cy.get("[data-cy=letter-container-right]").should("have.length", 2);
   });
 
   it("should update keyboard letter colors after every attempt", () => {
@@ -95,7 +95,9 @@ describe("game", () => {
 
     keysClick(["T", "E", "S", "T"]);
 
-    cy.get("[data-cy=error-container]").should("be.visible");
+    cy.get("[data-cy=error-container]")
+      .should("be.visible")
+      .contains("Apenas palavras com 5 letras");
   });
 
   it("should be possible to select letter with click", () => {
@@ -115,5 +117,17 @@ describe("game", () => {
     keysClick(["S"]);
 
     cy.get("[data-cy=modal-won]").should("be.visible");
+  });
+
+  it("should show an error if you try to send a word that doesn't exist in the list", () => {
+    cy.get("[data-cy=letters-row]")
+      .should("be.visible")
+      .should("have.length", 6);
+
+    keysClick(["T", "E", "S", "T", "R"]);
+
+    cy.get("[data-cy=error-container]")
+      .should("be.visible")
+      .contains("Palavra inválida");
   });
 });

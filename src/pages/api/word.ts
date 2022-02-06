@@ -1,40 +1,33 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest as Req, NextApiResponse as Res } from "next";
-import { getRandomWord, getWordById } from "../../database";
+import { getRandomWord, getWordById, getWordByKeys } from "../../database";
 
 type LetterStatus = "right" | "exists" | "wrong" | "unknow";
 
-export type Letter = {
-  key: string;
-  status: LetterStatus;
-} | null;
+export type Letter = { key: string; status: LetterStatus } | null;
 
 export type Data = {
-  data: {
-    wordId: number;
-    letters: Letter[];
-  };
+  wordId: number;
+  letters: Letter[];
 };
 
-type Error = { error: { message: string } };
+type Error = { message: string };
 
-export type Response = Data | Error;
+export type Response = {
+  data?: Data;
+  error?: Error;
+};
 
 type Body = { wordId?: number; keys: string[] };
 
-export default function handler(req: Req, res: Res<Response>) {
+export default async function handler(req: Req, res: Res<Response>) {
   if (req.method !== "POST")
     return res.status(400).json({ error: { message: "Invalid method" } });
 
-  const { wordId: cliendWordId, keys: clientKeys } = req.body as Body;
-
-  const serverWord =
-    cliendWordId !== undefined ? getWordById(cliendWordId) : getRandomWord();
-
-  if (!serverWord)
-    return res.status(400).json({ error: { message: "Database error" } });
+  const { wordId: cliendWordId, keys: clientKeys = [] } = req.body as Body;
 
   if (cliendWordId === undefined) {
+    const serverWord = await getRandomWord();
     return res.status(200).json({
       data: {
         wordId: serverWord.id,
@@ -44,6 +37,16 @@ export default function handler(req: Req, res: Res<Response>) {
       },
     });
   }
+
+  if (!!clientKeys.length) {
+    const matchWord = await getWordByKeys(clientKeys.join(""));
+    if (!matchWord) return res.json({ error: { message: "Invalid word" } });
+  }
+
+  const serverWord = await getWordById(cliendWordId);
+
+  if (!serverWord)
+    return res.status(400).json({ error: { message: "Database error" } });
 
   const serverWordKeys = serverWord.word.split("");
 

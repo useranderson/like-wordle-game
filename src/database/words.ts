@@ -684,7 +684,7 @@ export default [
   { word: "licao", id: 682 },
   { word: "forem", id: 683 },
   { word: "monge", id: 684 },
-  { word: "teste", id: 685 },
+  { word: "metro", id: 685 },
   { word: "clima", id: 686 },
   { word: "pareo", id: 687 },
   { word: "coral", id: 688 },
